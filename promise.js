@@ -53,7 +53,7 @@ Promise.prototype.then = function (onResolved, onRejected) {
 
             }
             if (this.PromiseState === 'rejected') {
-           
+
                 try {
                     let result = onRejected(this.PromiseResult)
                     if (result instanceof Promise) {
@@ -71,21 +71,20 @@ Promise.prototype.then = function (onResolved, onRejected) {
             }
             if (this.PromiseState === 'pending') {
                 this.callbacks.push({
-                    onResolved:function(){
+                    onResolved: function () {
                         let result = onResolved(self.PromiseResult)
                         if (result instanceof Promise) {
-                            result.then(r=>{
+                            result.then(r => {
                                 resolve(v)
-                            },r => {
+                            }, r => {
                                 reject(r)
                             })
-                            
-                        }
-                        else{
+
+                        } else {
                             resolve(result)
                         }
                     },
-                    onRejected:function(){
+                    onRejected: function () {
                         console.log('error');
                     }
                 })
@@ -110,33 +109,34 @@ Promise.prototype.then = function (onResolved, onRejected) {
 
 
 let promise = new Promise((resolve, reject) => {
-    setTimeout(()=>{
-        resolve("成功")
-    },1000)
-    
-    // reject("失败")
+    // setTimeout(()=>{
+    //     resolve("成功")
+    // },1000)
+    // resolve("成功")
+
+    reject("失败")
 
 
     // throw "出错了！！！"
 })
 
 
-// promise.then(value => {
-//     return value
-// }, reason => {
-//     console.warn(reason)
-
-// })
-let res = promise.then(value => {
-    // return new Promise((resolve, reject) => {
-    //     // reject("回调函数内部的Promise")
+promise.then(value => {
     return value
-
-    //     throw "出错了！！！"
-    // })
 }, reason => {
-    console.error(reason, 1)
+    console.warn(reason)
 
 })
-console.log(res);
+// let res = promise.then(value => {
+//     // return new Promise((resolve, reject) => {
+//     //     // reject("回调函数内部的Promise")
+//     return value
+
+//     //     throw "出错了！！！"
+//     // })
+// }, reason => {
+//     console.error(reason, 1)
+
+// })
+// console.log(res);
 // throw "出错了！！！"
