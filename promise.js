@@ -8,11 +8,11 @@ function Promise(executor) {
         if (self.PromiseState !== 'pending') return
         self.PromiseState = "fulfilled";
         self.PromiseResult = data
-        // if (self.callback.inResolved) {
-        //     self.callback.inResolved(data)
+        // if (self.callback.onResolved) {
+        //     self.callback.onResolved(data)
         // }
         self.callbacks.forEach(item => {
-            item.inResolved(data)
+            item.onResolved(data)
         })
     }
 
@@ -32,11 +32,12 @@ function Promise(executor) {
     }
 
 }
-Promise.prototype.then = function (inResolved, onRejected) {
+Promise.prototype.then = function (onResolved, onRejected) {
+    const self = this
     return new Promise((resolve, reject) => {
             if (this.PromiseState === 'fulfilled') {
                 try {
-                    let result = inResolved(this.PromiseResult)
+                    let result = onResolved(this.PromiseResult)
                     if (result instanceof Promise) {
                         result.then(r => {
                             resolve(r)
@@ -52,12 +53,41 @@ Promise.prototype.then = function (inResolved, onRejected) {
 
             }
             if (this.PromiseState === 'rejected') {
-                onRejected(this.PromiseResult)
+           
+                try {
+                    let result = onRejected(this.PromiseResult)
+                    if (result instanceof Promise) {
+                        result.then(r => {
+                            resolve(r)
+                        }, v => {
+                            reject(v)
+                        })
+                    } else {
+                        resolve(result)
+                    }
+                } catch (error) {
+                    reject(error)
+                }
             }
             if (this.PromiseState === 'pending') {
                 this.callbacks.push({
-                    inResolved,
-                    onRejected
+                    onResolved:function(){
+                        let result = onResolved(self.PromiseResult)
+                        if (result instanceof Promise) {
+                            result.then(r=>{
+                                resolve(v)
+                            },r => {
+                                reject(r)
+                            })
+                            
+                        }
+                        else{
+                            resolve(result)
+                        }
+                    },
+                    onRejected:function(){
+                        console.log('error');
+                    }
                 })
             }
 
@@ -80,8 +110,10 @@ Promise.prototype.then = function (inResolved, onRejected) {
 
 
 let promise = new Promise((resolve, reject) => {
-
-    resolve("成功")
+    setTimeout(()=>{
+        resolve("成功")
+    },1000)
+    
     // reject("失败")
 
 
