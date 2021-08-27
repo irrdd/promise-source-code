@@ -138,5 +138,5 @@ promise.then(value => {
 //     console.error(reason, 1)
 
 // })
-// console.log(res);
+console.log(res);
 // throw "出错了！！！"
