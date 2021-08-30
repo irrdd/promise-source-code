@@ -72,20 +72,41 @@ Promise.prototype.then = function (onResolved, onRejected) {
             if (this.PromiseState === 'pending') {
                 this.callbacks.push({
                     onResolved: function () {
-                        let result = onResolved(self.PromiseResult)
-                        if (result instanceof Promise) {
-                            result.then(r => {
-                                resolve(v)
-                            }, r => {
-                                reject(r)
-                            })
+                        try {
+                            let result = onResolved(self.PromiseResult)
+                            if (result instanceof Promise) {
+                                result.then(r => {
+                                    resolve(v)
+                                }, r => {
+                                    reject(r)
+                                })
 
-                        } else {
-                            resolve(result)
+                            } else {
+                                resolve(result)
+                            }
+                        } catch (error) {
+                            resolve(error)
                         }
+
                     },
                     onRejected: function () {
-                        console.log('error');
+                        try {
+                            let result = onRejected(self.PromiseResult)
+                            if (result instanceof Promise) {
+                                result.then(r => {
+                                    resolve(v)
+                                }, r => {
+                                    reject(r)
+                                })
+
+                            } else {
+                                resolve(result)
+                            }
+                        } catch (error) {
+                            resolve(error)
+
+                        }
+
                     }
                 })
             }
@@ -109,31 +130,39 @@ Promise.prototype.then = function (onResolved, onRejected) {
 
 
 let promise = new Promise((resolve, reject) => {
-    // setTimeout(()=>{
-    //     resolve("成功")
-    // },1000)
+    setTimeout(()=>{
+        resolve("成功")
+    },1000)
     // resolve("成功")
 
-    reject("失败")
+    // reject("失败")
 
 
     // throw "出错了！！！"
 })
 
 
+ promise.then(value => {
+    return value
+}, reason => {
+    console.warn(reason)
+
+})
 promise.then(value => {
     return value
 }, reason => {
     console.warn(reason)
 
 })
+// console.log(res)
 // let res = promise.then(value => {
 //     // return new Promise((resolve, reject) => {
 //     //     // reject("回调函数内部的Promise")
-//     return value
+//     //     // return value
 
-//     //     throw "出错了！！！"
+//     //         throw "出错了！！！"
 //     // })
+//     return "erghu"
 // }, reason => {
 //     console.error(reason, 1)
 
