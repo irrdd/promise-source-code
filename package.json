@@ -1,0 +1,23 @@
+{
+  "name": "nodejsStudy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "openFile.js",
+  "type": "module",
+  "dependencies": {
+    "_fs@0.0.1-security@fs": "^0.0.1-security",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitee.com:wangdongxv/nodejsStudy.git"
+  },
+  "keywords": [],
+  "author": "wang",
+  "license": "ISC"
+}
