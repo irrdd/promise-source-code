@@ -1,4 +1,5 @@
 function Promise(executor) {
+    
     this.PromiseState = 'pending';
     this.PromiseResult = null
     this.callbacks = []
@@ -11,9 +12,10 @@ function Promise(executor) {
         // if (self.callback.onResolved) {
         //     self.callback.onResolved(data)
         // }
-
-        self.callbacks.forEach(item => {
-            item.onResolved(data)
+        setTimeout(() => {
+            self.callbacks.forEach(item => {
+                item.onResolved(data)
+            })
         })
     }
 
@@ -21,9 +23,12 @@ function Promise(executor) {
         if (self.PromiseState !== 'pending') return
         self.PromiseState = "rejected";
         self.PromiseResult = data
-        self.callbacks.forEach(item => {
-            item.onRejected(data)
+        setTimeout(() => {
+            self.callbacks.forEach(item => {
+                item.onRejected(data)
+            })
         })
+
     }
     try {
         executor(resolve, reject)
@@ -36,13 +41,14 @@ function Promise(executor) {
 Promise.prototype.then = function (onResolved, onRejected) {
     const self = this
     // 判断回调函数参数
-    if(typeof onRejected !== 'function'){
-        onRejected = reason =>{
+    if (typeof onRejected !== 'function') {
+
+        onRejected = reason => {
             throw reason
         }
     }
-    if(typeof onResolved !== 'function'){
-        onResolved = reason =>{
+    if (typeof onResolved !== 'function') {
+        onResolved = reason => {
             return reason
         }
     }
@@ -64,11 +70,16 @@ Promise.prototype.then = function (onResolved, onRejected) {
                 }
             }
             if (this.PromiseState === 'fulfilled') {
-                callback(onResolved)
+                setTimeout(() => {
+                    callback(onResolved)
+                })
 
             }
             if (this.PromiseState === 'rejected') {
-                callback(onRejected)
+                setTimeout(() => {
+                    callback(onRejected)
+                })
+
             }
             if (this.PromiseState === 'pending') {
                 this.callbacks.push({
@@ -92,44 +103,59 @@ Promise.prototype.then = function (onResolved, onRejected) {
 }
 // 添加catch方法
 Promise.prototype.catch = function (onRejected) {
-    return this.then(undefined,onRejected)
+    return this.then(undefined, onRejected)
 }
 // 添加resolve
-Promise.resolve = function(value){
+Promise.resolve = function (value) {
     return new Promise((resolve, reject) => {
-        if(value instanceof Promise) {
-            value.then(v=>{
+        if (value instanceof Promise) {
+            value.then(v => {
                 resolve(v)
-            },r=>{
+            }, r => {
                 reject(r)
             })
-        }else{
+        } else {
             resolve(value)
         }
     })
 }
 // 添加reject方法
-Promise.reject = function(reason){
+Promise.reject = function (reason) {
     return new Promise((resolve, reject) => {
         reject(reason)
     })
 }
-Promise.all = function(promises){
+Promise.all = function (promises) {
     return new Promise((resolve, reject) => {
         let count = 0
         let arr = []
         for (let index = 0; index < promises.length; index++) {
-            promises[index].then(v=>{
+            promises[index].then(v => {
                 count++
-                arr[index] = v 
-                if (count ===promises.length) {
+                arr[index] = v
+                if (count === promises.length) {
                     resolve(arr)
                 }
-            },r=>{
+            }, r => {
                 reject(r)
             })
-           
-            
+
+
+        }
+    })
+}
+Promise.race = function (promises) {
+    return new Promise((resolve, reject) => {
+
+        for (let index = 0; index < promises.length; index++) {
+            promises[index].then(v => {
+                resolve(v)
+
+            }, r => {
+                reject(r)
+            })
+
+
         }
     })
 }
@@ -143,6 +169,7 @@ let promise = new Promise((resolve, reject) => {
 
     // },1000)
     resolve("成功")
+    console.log("3333");
 
     // reject("失败")
 
@@ -157,12 +184,16 @@ let promise = new Promise((resolve, reject) => {
 //     console.warn(reason)
 
 // })
-// promise.then(value => {
-//     return value
-// }, reason => {
-//     console.warn(reason)
+let res = promise.then(value => {
+    console.log("1111");
 
-// })
+    return value
+}, reason => {
+    console.warn(reason)
+
+})
+console.log("22222");
+
 // console.log(promise)
 // let res = promise.then(value => {
 //     return new Promise((resolve, reject) => {
@@ -187,10 +218,17 @@ let promise = new Promise((resolve, reject) => {
 // setTimeout(()=>{
 //     console.log(res);
 
-let p1 = Promise.reject("243")
-let p2 = Promise.reject("rsf")
-let p3 = Promise.reject("ert")
-let res = Promise.all([p1,p2,p3])
+// let p1 = Promise.resolve(new Promise((resolve, reject) => {
+//     setTimeout(()=>{
+//         // resolve("成功")
+//     reject("失败")
+
+//     },1000)
+
+// }))
+// let p2 = Promise.resolve("rsf")
+// let p3 = Promise.resolve("ert")
+// let res = Promise.race([p1, p2, p3])
 // },1050)
 // throw "出错了！！！"
 console.log(res);
